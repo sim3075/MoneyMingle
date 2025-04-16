@@ -1,16 +1,56 @@
-# money_mingle
+# 💸 MoneyMingle – Tu compañero de finanzas personales
 
-A new Flutter project.
+**MoneyMingle** es una aplicación móvil desarrollada en Flutter que te permite **gestionar, registrar y analizar tus ingresos y gastos de forma sencilla e intuitiva**. Diseñada para ayudarte a tener un mayor control de tus finanzas, visualizar tu comportamiento financiero y alcanzar tus metas de ahorro.
 
-## Getting Started
+## 🧠 Desarrollado por
+Simón Miranda – Juliana Betancur
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Funcionalidades principales
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- 🔐 **Autenticación**
+  - Registro e inicio de sesión con email y contraseña o cuenta de Google
+  - Recuperación de contraseña
+  - Validación de datos
+- 🧾 **Registro de movimientos**
+  - Añadir ingresos o gastos con monto, categoría, fecha y nota
+  - Edición y eliminación de movimientos
+  - Soporte para movimientos recurrentes
+  - Adjuntar recibos o fotos opcionales
+- 📊 **Gráficas estadísticas**
+  - Gráfica circular de gastos por categoría
+  - Gráfica de barras comparativa de ingresos y gastos mensuales
+  - Historial mensual descargable
+- 💵 **Panel financiero**
+  - Total disponible (ingresos - gastos)
+  - Balance diario/semanal/mensual
+  - Filtros por mes o rango de fechas
+- 🎯 **Herramientas financieras**
+  - Metas de ahorro personalizadas
+  - Presupuestos mensuales por categoría
+  - Alertas al sobrepasar presupuestos
+  - División de gastos con otros usuarios
+- 🌎 **Extras**
+  - Modo claro/oscuro automático
+  - Soporte para múltiples monedas
+  - App multilenguaje (Español / Inglés)
+  - Exportación a PDF/Excel
+  - Soporte offline y sincronización
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 📱 Tecnologías utilizadas
+
+- **Flutter** – Framework de UI multiplataforma
+- **Firebase**
+  - Firebase Authentication
+  - Cloud Firestore
+  - Firebase Storage
+  - Firebase Cloud Messaging (notificaciones push)
+- **State Management:** Provider / Riverpod / Bloc
+- **Gráficas:** `fl_chart`, `charts_flutter`
+- **PDF/Excel export:** `pdf`, `excel` (u otra librería según implementación)
+
+---
+
