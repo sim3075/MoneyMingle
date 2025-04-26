@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "573116276939",
+    "project_id": "moneymingle-f685f",
+    "storage_bucket": "moneymingle-f685f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573116276939:android:69c202b0b07e0f6b51fb4e",
+        "android_client_info": {
+          "package_name": "com.example.money_mingle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1XEoASgT8y2BwzvKtHWY8cu-EMi53YBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
