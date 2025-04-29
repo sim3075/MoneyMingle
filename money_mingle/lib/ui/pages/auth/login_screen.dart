@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mingle/ui/widgets/shared/custom_textfield.dart';
 import 'package:money_mingle/ui/widgets/shared/custom_button.dart';
-import 'package:money_mingle/ui/widgets/shared/quote_carousel.dart';
-
+import 'package:money_mingle/ui/pages/auth/widgets/quote_carousel.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -50,19 +49,15 @@ class LoginScreen extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    
+                    Navigator.pushNamed(context, '/forgot-password');
                   },
                   child: const Text('¿Olvidaste tu contraseña?'),
                 ),
               ),
               const SizedBox(height: 24),
-              CustomButton(
-                text: 'Iniciar Sesión',
-                onPressed: () {
-                  
-                  
-                },
-              ),
+              CustomButton(text: 'Iniciar Sesión', onPressed: () {
+                Navigator.pushNamed(context, '/home');
+              }),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -70,12 +65,13 @@ class LoginScreen extends StatelessWidget {
                   const Text('¿No tienes cuenta? '),
                   GestureDetector(
                     onTap: () {
-                      
+                      Navigator.pushNamed(context, '/register');
                     },
                     child: Text(
                       'Regístrate',
-                      style: TextStyle(color: theme.colorScheme.primary, 
-                      fontWeight: FontWeight.bold
+                      style: TextStyle(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
