@@ -13,9 +13,35 @@ class TransactionForm extends StatefulWidget {
 }
 
 class _TransactionFormState extends State<TransactionForm> {
-  final _formKey = GlobalKey<FormState>();
-  String? _title;
-  double? _amount;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final title = _titleController.text.trim();
+    final amountText = _amountController.text.trim();
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El título es requerido')),
+      );
+      return;
+    }
+    final amount = double.tryParse(amountText);
+    if (amount == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Monto inválido')),
+      );
+      return;
+    }
+    // TODO: Agregar logica de guardado de transacción
+    Navigator.of(context).pop({'title': title, 'amount': amount});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,41 +52,27 @@ class _TransactionFormState extends State<TransactionForm> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Título'),
-                onSaved: (v) => _title = v,
-                validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Monto'),
-                keyboardType: TextInputType.number,
-                onSaved: (v) => _amount = double.tryParse(v ?? ''),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Requerido';
-                  return double.tryParse(v) == null ? 'Número inválido' : null;
-                },
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                child: Text(isExpense ? 'Guardar Gasto' : 'Guardar Ingreso'),
-                onPressed: _submit,
-              ),
-            ],
-          ),
+        child: Column(
+          children: [
+            CustomTextField(
+              controller: _titleController,
+              label: 'Título',
+              icon: Icons.title,
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: _amountController,
+              label: 'Monto',
+              icon: Icons.attach_money,
+            ),
+            const SizedBox(height: 24),
+            CustomButton(
+              text: isExpense ? 'Guardar Gasto' : 'Guardar Ingreso',
+              onPressed: _submit,
+            ),
+          ],
         ),
       ),
     );
-  }
-
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      //logica luego
-      Navigator.of(context).pop(); 
-    }
   }
 }
