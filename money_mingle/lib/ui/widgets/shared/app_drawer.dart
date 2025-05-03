@@ -41,8 +41,7 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.person),
             title: const Text('Profile'),
             onTap: () {
-              Navigator.pop(context); // Cierra el Drawer
-              // Navegar a la pantalla de Perfil
+              Navigator.pushNamed(context, '/profile');
             },
           ),
           ListTile(
