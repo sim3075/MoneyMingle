@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mingle/app_theme.dart';
 import 'package:money_mingle/routes/app_routes.dart';
+//import 'package:money_mingle/ui/widgets/shared/navigation_bar.dart';
 
 void main() {
   runApp(const MoneyMingleApp());

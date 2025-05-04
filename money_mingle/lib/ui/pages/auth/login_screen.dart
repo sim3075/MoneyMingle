@@ -56,7 +56,7 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               CustomButton(text: 'Iniciar Sesión', onPressed: () {
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/root-screen');
               }),
               const SizedBox(height: 16),
               Row(

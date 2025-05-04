@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mingle/ui/pages/RootScreen.dart';
 import 'package:money_mingle/ui/pages/auth/forgot_password_screen.dart';
 import 'package:money_mingle/ui/pages/auth/register_screen.dart';
 import 'package:money_mingle/ui/pages/auth/login_screen.dart';
@@ -11,6 +12,7 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String home = '/home';
   static const String profile = '/profile';
+  static const String rootScreen = '/root-screen';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -19,6 +21,7 @@ class AppRoutes {
       forgotPassword: (context) => ForgotPasswordScreen(),
       home: (context) => HomeScreen(),
       profile: (context) => ProfileScreen(),
+      rootScreen: (context) => RootScreen()
     };
   }
 }
