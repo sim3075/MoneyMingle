@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:money_mingle/app_theme.dart';
+import 'package:money_mingle/models/transaction.dart';
 
 class MonthlySummary extends StatelessWidget {
-  const MonthlySummary({super.key});
+  const MonthlySummary({super.key, required List<Transaction> transactions});
 
   @override
   Widget build(BuildContext context) {

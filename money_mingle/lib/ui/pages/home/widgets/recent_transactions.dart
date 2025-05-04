@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:money_mingle/models/transaction.dart';
 
 class RecentTransactions extends StatelessWidget {
-  const RecentTransactions({super.key});
+  const RecentTransactions({super.key, required List<Transaction> transactions});
 
   @override
   Widget build(BuildContext context) {

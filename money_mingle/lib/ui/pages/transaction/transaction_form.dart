@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:money_mingle/models/transaction.dart';               // trae TransactionType
 import 'package:money_mingle/ui/widgets/shared/custom_textfield.dart';
 import 'package:money_mingle/ui/widgets/shared/custom_button.dart';
-import 'widgets/category_selector.dart';
-import 'widgets/note_field.dart';
-import 'widgets/date_field.dart';
+import 'package:image_picker/image_picker.dart';
 
-enum TransactionType { expense, income }
+import 'widgets/category_selector.dart';
+import 'widgets/date_field.dart';
+import 'widgets/note_field.dart';
+import 'widgets/receipt_field.dart';
 
 class TransactionForm extends StatefulWidget {
   final TransactionType type;
@@ -16,30 +18,20 @@ class TransactionForm extends StatefulWidget {
 }
 
 class _TransactionFormState extends State<TransactionForm> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
-  String? _selectedCategory;
+  final _titleController  = TextEditingController();
+  final _amountController = TextEditingController();
+  final _noteController   = TextEditingController();
+
   DateTime? _selectedDate;
+  String?   _selectedCategory;
+  XFile?    _receiptImage;
+  final _picker = ImagePicker();
 
-  final List<String> _expenseCategories = [
-    'Alimentación',
-    'Transporte',
-    'Vivienda',
-    'Servicios',
-    'Salud',
-    'Ocio',
-    'Compras',
-    'Imprevistos',
+  final _expenseCats = [
+    'Alimentación','Transporte','Vivienda',
+    'Servicios','Salud','Ocio','Compras','Imprevistos'
   ];
-  final List<String> _incomeCategories = [
-    'Sueldo',
-    'Freelance',
-    'Inversiones',
-    'Regalos',
-    'Otros',
-  ];
-
+  final _incomeCats  = ['Sueldo','Freelance','Inversiones','Regalos','Otros'];
 
   @override
   void dispose() {
@@ -49,34 +41,37 @@ class _TransactionFormState extends State<TransactionForm> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final img = await _picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 800, maxHeight: 800, imageQuality: 80,
+    );
+    if (img != null) setState(() => _receiptImage = img);
+  }
+
   void _submit() {
     final title = _titleController.text.trim();
-    final amountText = _amountController.text.trim();
-    if (title.isEmpty) {
+    final amt   = double.tryParse(_amountController.text.trim());
+    if (title.isEmpty || amt == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El título es obligatorio')),
+        const SnackBar(content: Text('Revisa título y cantidad')),
       );
       return;
     }
-    final amount = double.tryParse(amountText);
-    if (amount == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cantidad incorrecto')),
-      );
-      return;
-    }
-    // TODO: Agregar logica de guardado de transacción
-    Navigator.of(context).pop({'title': title, 'amount': amount});
+    Navigator.of(context).pop({
+      'title':       title,
+      'amount':      amt,
+      'date':        _selectedDate,
+      'category':    _selectedCategory,
+      'note':        _noteController.text.trim(),
+      'receiptPath': _receiptImage?.path,
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-     final isExpense = widget.type == TransactionType.expense;
-
-    // 2) Escoger la lista adecuada
-    final categories = isExpense
-        ? _expenseCategories
-        : _incomeCategories;
+    final isExpense = widget.type == TransactionType.expense;
+    final cats      = isExpense ? _expenseCats : _incomeCats;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,42 +79,42 @@ class _TransactionFormState extends State<TransactionForm> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            CustomTextField(
-              controller: _titleController,
-              label: 'Título',
-              icon: Icons.title,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: _amountController,
-              label: 'Cantidad',
-              icon: Icons.attach_money,
-            ),
-            const SizedBox(height: 16),
-            // --- Fecha ---
-            DateField(
-              selectedDate: _selectedDate,
-              onDateChanged: (d) => setState(() => _selectedDate = d),
-            ),
-            const SizedBox(height: 16),
-            NoteField(controller: _noteController
-            ),
-            const SizedBox(height: 16),
-            CategorySelector(
-              selected: _selectedCategory,
-              categories: categories,
-              onChanged: (val) => setState(() => _selectedCategory = val),
-            ),
-            const Spacer(),
-            const SizedBox(height: 24),
-            CustomButton(
-              text: isExpense ? 'Añadir gasto' : 'Añadir Ingreso',
-              onPressed: _submit,
-            ),
-          ],
-        ),
+        child: Column(children: [
+          CustomTextField(
+            controller: _titleController,
+            label: 'Título',
+            icon: Icons.title,
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            controller: _amountController,
+            label: 'Cantidad',
+            icon: Icons.attach_money,
+          ),
+          const SizedBox(height: 16),
+          DateField(
+            selectedDate: _selectedDate,
+            onDateChanged: (d) => setState(() => _selectedDate = d),
+          ),
+          const SizedBox(height: 16),
+          NoteField(controller: _noteController),
+          const SizedBox(height: 16),
+          CategorySelector(
+            selected:   _selectedCategory,
+            categories: cats,
+            onChanged:  (v) => setState(() => _selectedCategory = v),
+          ),
+          const SizedBox(height: 16),
+          ReceiptField(
+            image: _receiptImage,
+            onPick: _pickImage,
+          ),
+          const Spacer(),
+          CustomButton(
+            text: isExpense ? 'Añadir gasto' : 'Añadir ingreso',
+            onPressed: _submit,
+          ),
+        ]),
       ),
     );
   }
