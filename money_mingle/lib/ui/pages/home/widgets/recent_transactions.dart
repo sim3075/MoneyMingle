@@ -8,17 +8,17 @@ class RecentTransactions extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: const [
-        Text("Recent Transactions", style: TextStyle(fontWeight: FontWeight.bold)),
+        Text("Transacciones recientes", style: TextStyle(fontWeight: FontWeight.bold)),
         ListTile(
           leading: Icon(Icons.shopping_cart),
-          title: Text("Groceries"),
-          subtitle: Text("Today"),
+          title: Text("Alimentación"),
+          subtitle: Text("Hoy"),
           trailing: Text("- \$50"),
         ),
         ListTile(
           leading: Icon(Icons.attach_money),
-          title: Text("Salary"),
-          subtitle: Text("Yesterday"),
+          title: Text("Salario"),
+          subtitle: Text("Ayer"),
           trailing: Text("+ \$2000"),
         ),
       ],

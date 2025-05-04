@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
-              title: const Text('Agregar Gasto'),
+              title: const Text('Añadir Gasto'),
               onTap: () {
                 Navigator.pop(context);
                 _openForm(context, TransactionType.expense);
@@ -36,7 +36,7 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.add_circle, color: AppTheme.incomeColor),
-              title: const Text('Agregar Ingreso'),
+              title: const Text('Añadir Ingreso'),
               onTap: () {
                 Navigator.pop(context);
                 _openForm(context, TransactionType.income);
@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('April 2024')),
+      appBar: AppBar(title: const Text('Abril 2024')),
       drawer: const AppDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMenu(context),
@@ -69,11 +69,11 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
                 InfoCard(
-                    title: 'Income',
+                    title: 'Ingresos',
                     value: '\$3000',
                     color: AppTheme.incomeColor),
                 InfoCard(
-                    title: 'Expenses',
+                    title: 'Gastos',
                     value: '\$1800',
                     color: AppTheme.expenseColor),
               ],

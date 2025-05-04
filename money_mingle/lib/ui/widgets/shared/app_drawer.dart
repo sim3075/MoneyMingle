@@ -31,7 +31,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.list),
-            title: const Text('Transactions'),
+            title: const Text('Transacciones'),
             onTap: () {
               Navigator.pop(context); // Cierra el Drawer
               // Navegar a la pantalla de Transacciones
@@ -39,7 +39,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Profile'),
+            title: const Text('Perfil'),
             onTap: () {
               Navigator.pop(context); // Cierra el Drawer
               // Navegar a la pantalla de Perfil
@@ -47,7 +47,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            title: const Text('Ajustes'),
             onTap: () {
               Navigator.pop(context); // Cierra el Drawer
               // Navegar a la pantalla de Configuración

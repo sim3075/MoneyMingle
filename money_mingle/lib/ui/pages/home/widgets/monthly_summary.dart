@@ -13,7 +13,7 @@ class MonthlySummary extends StatelessWidget {
         color: AppTheme.secondaryColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text("You have \$300 left for this month 💰"),
+      child: const Text("Tienes \$300 para gastar ese mes 💰"),
     );
   }
 }
