@@ -10,6 +10,7 @@ class Transaction {
   final String? category;
   final String? note;
   final String? receiptPath;
+  final bool isFixed;
 
   Transaction({
     required this.type,
@@ -19,6 +20,7 @@ class Transaction {
     this.category,
     this.note,
     this.receiptPath,
+    this.isFixed = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -29,6 +31,7 @@ class Transaction {
         'category': category,
         'note': note,
         'receiptPath': receiptPath,
+        'isFixed': isFixed,
       };
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
@@ -42,6 +45,7 @@ class Transaction {
       category: json['category'],
       note: json['note'],
       receiptPath: json['receiptPath'],
+      isFixed: json['isFixed'] as bool? ?? false, 
     );
   }
 

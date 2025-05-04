@@ -3,13 +3,16 @@ import 'package:money_mingle/models/transaction.dart';
 import 'widgets/date_filter_selector.dart';
 import 'widgets/category_filter_selector.dart';
 import 'widgets/transaction_list.dart';
+import '../transaction/transaction_form.dart';
 
 class TransactionsScreen extends StatefulWidget {
   final List<Transaction> transactions;
+  final Future<void> Function() save;  // callback para persistir cambios
 
   const TransactionsScreen({
     Key? key,
     required this.transactions,
+    required this.save,
   }) : super(key: key);
 
   @override
@@ -21,7 +24,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   DateTime _selectedDate = DateTime.now();
   String? _selectedCategory;
 
-  // Tus categorías fijas:
   final _expenseCats = [
     'Alimentación', 'Transporte', 'Vivienda',
     'Servicios', 'Salud', 'Ocio', 'Compras', 'Imprevistos'
@@ -33,34 +35,81 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Transaction> get _filtered {
     return widget.transactions.where((tx) {
       final d = tx.date;
-      // 1) Filtrar por fecha
-      final byDate = () {
-        switch (_dateFilter) {
-          case DateFilter.day:
-            return d.year == _selectedDate.year
-                && d.month == _selectedDate.month
-                && d.day == _selectedDate.day;
-          case DateFilter.month:
-            return d.year == _selectedDate.year
-                && d.month == _selectedDate.month;
-          case DateFilter.year:
-            return d.year == _selectedDate.year;
-        }
-      }();
-      // 2) Filtrar por categoría (si null, todo)
+      bool byDate;
+      switch (_dateFilter) {
+        case DateFilter.day:
+          byDate = d.year == _selectedDate.year
+              && d.month == _selectedDate.month
+              && d.day == _selectedDate.day;
+          break;
+        case DateFilter.week:
+          final startOfWeek = _selectedDate.subtract(
+            Duration(days: _selectedDate.weekday - 1),
+          );
+          final endOfWeek = startOfWeek.add(const Duration(days: 6));
+          byDate = (d.isAtSameMomentAs(startOfWeek) || d.isAfter(startOfWeek))
+              && (d.isAtSameMomentAs(endOfWeek)   || d.isBefore(endOfWeek));
+          break;
+        case DateFilter.month:
+          byDate = d.year == _selectedDate.year
+              && d.month == _selectedDate.month;
+          break;
+        case DateFilter.year:
+          byDate = d.year == _selectedDate.year;
+          break;
+      }
       final byCategory = _selectedCategory == null
           ? true
           : tx.category == _selectedCategory;
-
       return byDate && byCategory;
     }).toList();
   }
 
-  // Combina ambas listas para el dropdown
   List<String> get _allCategories => [
     ..._expenseCats,
     ..._incomeCats,
   ];
+
+  Future<void> _editTransaction(Transaction tx) async {
+    final updated = await Navigator.push<Transaction?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TransactionForm(
+          type: tx.type,
+          initial: tx,
+        ),
+      ),
+    );
+    if (updated != null) {
+      final idx = widget.transactions.indexOf(tx);
+      setState(() => widget.transactions[idx] = updated);
+      await widget.save();
+    }
+  }
+
+  Future<void> _deleteTransaction(Transaction tx) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Eliminar transacción'),
+        content: const Text('¿Seguro que deseas eliminar esta transacción?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('ELIMINAR'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      setState(() => widget.transactions.remove(tx));
+      await widget.save();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,28 +120,25 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Selector de fecha (día / mes / año)
             DateFilterSelector(
-              filter:         _dateFilter,
-              selectedDate:   _selectedDate,
-              onFilterChanged:(f) => setState(() => _dateFilter = f),
-              onDateChanged:  (d) => setState(() => _selectedDate = d),
+              filter: _dateFilter,
+              selectedDate: _selectedDate,
+              onFilterChanged: (f) => setState(() => _dateFilter = f),
+              onDateChanged: (d) => setState(() => _selectedDate = d),
             ),
-
             const SizedBox(height: 16),
-
-            // Selector de categoría (incluye "Todas")
             CategoryFilterSelector(
-              selected:   _selectedCategory,
+              selected: _selectedCategory,
               categories: _allCategories,
-              onChanged:  (c) => setState(() => _selectedCategory = c),
+              onChanged: (c) => setState(() => _selectedCategory = c),
             ),
-
             const SizedBox(height: 24),
-
-            // Lista filtrada
             Expanded(
-              child: TransactionsList(items: _filtered),
+              child: TransactionsList(
+                items: _filtered,
+                onEdit: _editTransaction,
+                onDelete: _deleteTransaction,
+              ),
             ),
           ],
         ),

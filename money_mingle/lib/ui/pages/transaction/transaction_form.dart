@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:money_mingle/models/transaction.dart';               // trae TransactionType
+import 'package:money_mingle/models/transaction.dart';               
 import 'package:money_mingle/ui/widgets/shared/custom_textfield.dart';
 import 'package:money_mingle/ui/widgets/shared/custom_button.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'widgets/category_selector.dart';
 import 'widgets/date_field.dart';
 import 'widgets/note_field.dart';
@@ -11,7 +10,12 @@ import 'widgets/receipt_field.dart';
 
 class TransactionForm extends StatefulWidget {
   final TransactionType type;
-  const TransactionForm({ required this.type, Key? key }) : super(key: key);
+  final Transaction? initial;    
+  const TransactionForm({
+    required this.type,
+    this.initial,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<TransactionForm> createState() => _TransactionFormState();
@@ -25,13 +29,29 @@ class _TransactionFormState extends State<TransactionForm> {
   DateTime? _selectedDate;
   String?   _selectedCategory;
   XFile?    _receiptImage;
-  final _picker = ImagePicker();
+  bool      _isFixed = false;     
 
+  final _picker = ImagePicker();
   final _expenseCats = [
     'Alimentación','Transporte','Vivienda',
     'Servicios','Salud','Ocio','Compras','Imprevistos'
   ];
   final _incomeCats  = ['Sueldo','Freelance','Inversiones','Regalos','Otros'];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initial != null) {
+      final tx = widget.initial!;
+      _titleController.text   = tx.title;
+      _amountController.text  = tx.amount.toString();
+      _selectedDate           = tx.date;
+      _selectedCategory       = tx.category;
+      _noteController.text    = tx.note ?? '';
+      _receiptImage = tx.receiptPath != null ? XFile(tx.receiptPath!) : null;
+      _isFixed = tx.isFixed;             
+    }
+  }
 
   @override
   void dispose() {
@@ -58,14 +78,17 @@ class _TransactionFormState extends State<TransactionForm> {
       );
       return;
     }
-    Navigator.of(context).pop({
-      'title':       title,
-      'amount':      amt,
-      'date':        _selectedDate,
-      'category':    _selectedCategory,
-      'note':        _noteController.text.trim(),
-      'receiptPath': _receiptImage?.path,
-    });
+    final newTx = Transaction(
+      type:        widget.type,
+      title:       title,
+      amount:      amt,
+      date:        _selectedDate ?? DateTime.now(),
+      category:    _selectedCategory,
+      note:        _noteController.text.trim(),
+      receiptPath: _receiptImage?.path,
+      isFixed:     _isFixed,      
+    );
+    Navigator.of(context).pop(newTx);
   }
 
   @override
@@ -109,6 +132,15 @@ class _TransactionFormState extends State<TransactionForm> {
             image: _receiptImage,
             onPick: _pickImage,
           ),
+
+          CheckboxListTile(
+            title: const Text('Recurrente (fijo)'),
+            subtitle: const Text('Se añadirá automáticamente'),
+            value: _isFixed,
+            onChanged: (v) => setState(() => _isFixed = v ?? false),
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+
           const Spacer(),
           CustomButton(
             text: isExpense ? 'Añadir gasto' : 'Añadir ingreso',

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-enum DateFilter { day, month, year }
+enum DateFilter { day, week, month, year }
 
 class DateFilterSelector extends StatelessWidget {
   final DateFilter filter;
@@ -21,6 +21,14 @@ class DateFilterSelector extends StatelessWidget {
     switch (filter) {
       case DateFilter.day:
         return DateFormat('dd/MM/yyyy').format(selectedDate);
+      case DateFilter.week:
+        // Formato "Semana del 01/05 al 07/05"
+        final start = selectedDate.subtract(
+          Duration(days: selectedDate.weekday - 1),
+        );
+        final end = start.add(const Duration(days: 6));
+        return 'Del ${DateFormat('dd/MM').format(start)} '
+               'al ${DateFormat('dd/MM/yyyy').format(end)}';
       case DateFilter.month:
         return DateFormat('MM/yyyy').format(selectedDate);
       case DateFilter.year:
@@ -34,19 +42,27 @@ class DateFilterSelector extends StatelessWidget {
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      helpText: filter == DateFilter.year
-          ? 'Selecciona año'
-          : filter == DateFilter.month
-              ? 'Selecciona mes'
-              : 'Selecciona fecha',
+      helpText: () {
+        switch (filter) {
+          case DateFilter.day:
+            return 'Selecciona fecha';
+          case DateFilter.week:
+            return 'Selecciona una fecha dentro de la semana';
+          case DateFilter.month:
+            return 'Selecciona mes';
+          case DateFilter.year:
+            return 'Selecciona año';
+        }
+      }(),
     );
     if (picked != null) onDateChanged(picked);
   }
 
   @override
   Widget build(BuildContext context) {
-    final icons = {
+    final labels = {
       DateFilter.day: 'Día',
+      DateFilter.week: 'Semana',
       DateFilter.month: 'Mes',
       DateFilter.year: 'Año',
     };
@@ -59,7 +75,7 @@ class DateFilterSelector extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: ChoiceChip(
-                label: Text(icons[f]!),
+                label: Text(labels[f]!),
                 selected: filter == f,
                 onSelected: (_) => onFilterChanged(f),
               ),
@@ -71,11 +87,12 @@ class DateFilterSelector extends StatelessWidget {
           onTap: () => _pickDate(context),
           child: InputDecorator(
             decoration: InputDecoration(
-              labelText: filter == DateFilter.day
-                  ? 'Fecha'
-                  : filter == DateFilter.month
-                      ? 'Mes/Año'
-                      : 'Año',
+              labelText: {
+                DateFilter.day: 'Fecha',
+                DateFilter.week: 'Semana',
+                DateFilter.month: 'Mes/Año',
+                DateFilter.year: 'Año',
+              }[filter],
               prefixIcon: const Icon(Icons.calendar_today),
               border: const OutlineInputBorder(),
             ),
@@ -86,4 +103,3 @@ class DateFilterSelector extends StatelessWidget {
     );
   }
 }
-

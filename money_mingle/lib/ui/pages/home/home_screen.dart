@@ -107,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
         totalIncome:  _totalIncome,
         totalExpense: _totalExpense,
         transactions: _transactions,
+        save:          _saveTransactions,  // <— pasamos el callback
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMenu(context),
