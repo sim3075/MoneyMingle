@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:money_mingle/app_theme.dart';
-import 'package:money_mingle/models/transaction.dart';     // enum + modelo
+import 'package:money_mingle/models/transaction.dart';
 import '../transaction/transaction_form.dart';
 import 'widgets/info_card.dart';
 import 'widgets/recent_transactions.dart';
@@ -120,11 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             InfoCard(
-                title: 'Income',
+                title: 'Ingresos',
                 value: '\$${_totalIncome.toStringAsFixed(2)}',
                 color: AppTheme.incomeColor),
             InfoCard(
-                title: 'Expenses',
+                title: 'Gastos',
                 value: '\$${_totalExpense.toStringAsFixed(2)}',
                 color: AppTheme.expenseColor),
           ]),
