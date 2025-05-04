@@ -84,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.add_circle,
-                color: AppTheme.incomeColor),
+            leading:
+                const Icon(Icons.add_circle, color: AppTheme.incomeColor),
             title: const Text('Agregar Ingreso'),
             onTap: () {
               Navigator.pop(context);
@@ -106,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: AppDrawer(
         totalIncome:  _totalIncome,
         totalExpense: _totalExpense,
+        transactions: _transactions,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMenu(context),
@@ -113,26 +114,40 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('\$${net.toStringAsFixed(2)}',
-              style:
-                  const TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            InfoCard(
-                title: 'Ingresos',
-                value: '\$${_totalIncome.toStringAsFixed(2)}',
-                color: AppTheme.incomeColor),
-            InfoCard(
-                title: 'Gastos',
-                value: '\$${_totalExpense.toStringAsFixed(2)}',
-                color: AppTheme.expenseColor),
-          ]),
-          const SizedBox(height: 16),
-          RecentTransactions(transactions: _transactions),
-          const SizedBox(height: 8),
-          MonthlySummary(transactions: _transactions),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '\$${net.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InfoCard(
+                  title: 'Ingresos',
+                  value: '\$${_totalIncome.toStringAsFixed(2)}',
+                  color: AppTheme.incomeColor,
+                ),
+                InfoCard(
+                  title: 'Gastos',
+                  value: '\$${_totalExpense.toStringAsFixed(2)}',
+                  color: AppTheme.expenseColor,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Aquí mostramos las transacciones recientes:
+            RecentTransactions(transactions: _transactions),
+            const SizedBox(height: 8),
+            // Y el resumen mensual:
+            MonthlySummary(transactions: _transactions),
+          ],
+        ),
       ),
     );
   }
