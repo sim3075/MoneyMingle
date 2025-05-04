@@ -4,10 +4,12 @@ import 'widgets/date_filter_selector.dart';
 import 'widgets/category_filter_selector.dart';
 import 'widgets/transaction_list.dart';
 import '../transaction/transaction_form.dart';
+import '../budget/budget_form.dart';
+import '../budget/goals_form.dart';
 
 class TransactionsScreen extends StatefulWidget {
   final List<Transaction> transactions;
-  final Future<void> Function() save;  // callback para persistir cambios
+  final Future<void> Function() save;
 
   const TransactionsScreen({
     Key? key,
@@ -20,17 +22,15 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
-  DateFilter _dateFilter = DateFilter.day;
-  DateTime _selectedDate = DateTime.now();
-  String? _selectedCategory;
+  DateFilter _dateFilter    = DateFilter.day;
+  DateTime   _selectedDate  = DateTime.now();
+  String?    _selectedCategory;
 
   final _expenseCats = [
-    'Alimentación', 'Transporte', 'Vivienda',
-    'Servicios', 'Salud', 'Ocio', 'Compras', 'Imprevistos'
+    'Alimentación','Transporte','Vivienda',
+    'Servicios','Salud','Ocio','Compras','Imprevistos'
   ];
-  final _incomeCats = [
-    'Sueldo', 'Freelance', 'Inversiones', 'Regalos', 'Otros'
-  ];
+  final _incomeCats  = ['Sueldo','Freelance','Inversiones','Regalos','Otros'];
 
   List<Transaction> get _filtered {
     return widget.transactions.where((tx) {
@@ -43,12 +43,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               && d.day == _selectedDate.day;
           break;
         case DateFilter.week:
-          final startOfWeek = _selectedDate.subtract(
-            Duration(days: _selectedDate.weekday - 1),
-          );
-          final endOfWeek = startOfWeek.add(const Duration(days: 6));
-          byDate = (d.isAtSameMomentAs(startOfWeek) || d.isAfter(startOfWeek))
-              && (d.isAtSameMomentAs(endOfWeek)   || d.isBefore(endOfWeek));
+          final start = _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
+          final end   = start.add(const Duration(days: 6));
+          byDate = (d.isAtSameMomentAs(start) || d.isAfter(start))
+                && (d.isAtSameMomentAs(end)   || d.isBefore(end));
           break;
         case DateFilter.month:
           byDate = d.year == _selectedDate.year
@@ -70,14 +68,51 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     ..._incomeCats,
   ];
 
+  Future<void> _showAddOptions() async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet),
+              title: const Text('Presupuesto mensual'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BudgetForm()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag),
+              title: const Text('Meta de ahorro'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const GoalsForm()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.remove_circle, color: Colors.red),
+              title: const Text('Cancelar'),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _editTransaction(Transaction tx) async {
     final updated = await Navigator.push<Transaction?>(
       context,
       MaterialPageRoute(
-        builder: (_) => TransactionForm(
-          type: tx.type,
-          initial: tx,
-        ),
+        builder: (_) => TransactionForm(type: tx.type, initial: tx),
       ),
     );
     if (updated != null) {
@@ -124,24 +159,28 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               filter: _dateFilter,
               selectedDate: _selectedDate,
               onFilterChanged: (f) => setState(() => _dateFilter = f),
-              onDateChanged: (d) => setState(() => _selectedDate = d),
+              onDateChanged:   (d) => setState(() => _selectedDate = d),
             ),
             const SizedBox(height: 16),
             CategoryFilterSelector(
-              selected: _selectedCategory,
+              selected:   _selectedCategory,
               categories: _allCategories,
-              onChanged: (c) => setState(() => _selectedCategory = c),
+              onChanged:  (c) => setState(() => _selectedCategory = c),
             ),
             const SizedBox(height: 24),
             Expanded(
               child: TransactionsList(
-                items: _filtered,
-                onEdit: _editTransaction,
-                onDelete: _deleteTransaction,
+                items:   _filtered,
+                onEdit:  _editTransaction,
+                onDelete:_deleteTransaction,
               ),
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddOptions,
+        child: const Icon(Icons.add),
       ),
     );
   }

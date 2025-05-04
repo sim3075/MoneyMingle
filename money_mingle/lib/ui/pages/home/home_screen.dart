@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadTransactions() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw   = prefs.getString('transactions');
+    final raw = prefs.getString('transactions');
     if (raw != null) {
       setState(() => _transactions = Transaction.listFromJson(raw));
     }
@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  double get _totalIncome  => _transactions
+  double get _totalIncome => _transactions
       .where((t) => t.type == TransactionType.income)
       .fold(0, (sum, t) => sum + t.amount);
 
@@ -49,21 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
       .fold(0, (sum, t) => sum + t.amount);
 
   Future<void> _openForm(BuildContext ctx, TransactionType type) async {
-    final result = await Navigator.push<Map<String, dynamic>>(
+    final Transaction? tx = await Navigator.push<Transaction?>(
       ctx,
       MaterialPageRoute(builder: (_) => TransactionForm(type: type)),
     );
-    if (result != null) {
+    if (tx != null) {
       setState(() {
-        _transactions.add(Transaction(
-          type:        type,
-          title:       result['title'],
-          amount:      result['amount'],
-          date:        result['date'] ?? DateTime.now(),
-          category:    result['category'],
-          note:        result['note'],
-          receiptPath: result['receiptPath'],
-        ));
+        _transactions.add(tx);
       });
       await _saveTransactions();
     }
@@ -75,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (_) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ListTile(
-            leading: const Icon(Icons.remove_circle,
-                color: AppTheme.expenseColor),
+            leading:
+                const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
             title: const Text('Agregar Gasto'),
             onTap: () {
               Navigator.pop(context);
@@ -104,10 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Abril 2024')),
       drawer: AppDrawer(
-        totalIncome:  _totalIncome,
-        totalExpense: _totalExpense,
-        transactions: _transactions,
-        save:          _saveTransactions,  // <— pasamos el callback
+        totalIncome:           _totalIncome,
+        totalExpense:          _totalExpense,
+        transactions:          _transactions,
+        save:                  _saveTransactions,
+        onTransactionsChanged: _loadTransactions,  // <-- Aquí
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMenu(context),
@@ -115,41 +108,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '\$${net.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-              ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            '\$${net.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            InfoCard(
+              title: 'Ingresos',
+              value: '\$${_totalIncome.toStringAsFixed(2)}',
+              color: AppTheme.incomeColor,
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                InfoCard(
-                  title: 'Ingresos',
-                  value: '\$${_totalIncome.toStringAsFixed(2)}',
-                  color: AppTheme.incomeColor,
-                ),
-                InfoCard(
-                  title: 'Gastos',
-                  value: '\$${_totalExpense.toStringAsFixed(2)}',
-                  color: AppTheme.expenseColor,
-                ),
-              ],
+            InfoCard(
+              title: 'Gastos',
+              value: '\$${_totalExpense.toStringAsFixed(2)}',
+              color: AppTheme.expenseColor,
             ),
-            const SizedBox(height: 16),
-            // Aquí mostramos las transacciones recientes:
-            RecentTransactions(transactions: _transactions),
-            const SizedBox(height: 8),
-            // Y el resumen mensual:
-            MonthlySummary(transactions: _transactions),
-          ],
-        ),
+          ]),
+          const SizedBox(height: 16),
+          RecentTransactions(transactions: _transactions),
+          const SizedBox(height: 8),
+          MonthlySummary(transactions: _transactions),
+        ]),
       ),
     );
   }
 }
+

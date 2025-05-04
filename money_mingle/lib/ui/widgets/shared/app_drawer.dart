@@ -6,7 +6,8 @@ class AppDrawer extends StatelessWidget {
   final double totalIncome;
   final double totalExpense;
   final List<Transaction> transactions;
-  final Future<void> Function() save;  
+  final Future<void> Function() save;
+  final VoidCallback onTransactionsChanged;
 
   const AppDrawer({
     Key? key,
@@ -14,6 +15,7 @@ class AppDrawer extends StatelessWidget {
     required this.totalExpense,
     required this.transactions,
     required this.save,
+    required this.onTransactionsChanged,
   }) : super(key: key);
 
   @override
@@ -34,6 +36,7 @@ class AppDrawer extends StatelessWidget {
           title: const Text('Dashboard'),
           onTap: () {
             Navigator.pop(context);
+            // TODO: navegar a Dashboard
           },
         ),
 
@@ -41,7 +44,6 @@ class AppDrawer extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.list),
           title: const Text('Transacciones'),
-        
           onTap: () {
             Navigator.pop(context);
             Navigator.push(
@@ -49,26 +51,33 @@ class AppDrawer extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => TransactionsScreen(
                   transactions: transactions,
-                  save: save,  
+                  save: save,
                 ),
               ),
-            );
+            ).then((_) {
+              // Al volver de Transacciones, recargamos en HomeScreen
+              onTransactionsChanged();
+            });
           },
         ),
 
+        // Perfil
         ListTile(
           leading: const Icon(Icons.person),
           title: const Text('Perfil'),
           onTap: () {
             Navigator.pop(context);
+            // TODO: navegar a Perfil
           },
         ),
 
+        // Ajustes
         ListTile(
           leading: const Icon(Icons.settings),
           title: const Text('Ajustes'),
           onTap: () {
             Navigator.pop(context);
+            // TODO: navegar a Ajustes
           },
         ),
       ]),
