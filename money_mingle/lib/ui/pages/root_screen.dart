@@ -7,7 +7,8 @@ import 'package:money_mingle/ui/pages/profile/profile_screen.dart';
 import 'package:money_mingle/ui/pages/settings/settings_screen.dart';
 import 'package:money_mingle/ui/pages/transaction/transaction_form.dart';
 import 'package:money_mingle/ui/pages/transaction/transactions_view_screen.dart';
-
+import 'budget/budget_form.dart';
+import 'budget/goals_form.dart';
 class RootScreen extends StatefulWidget {
   const RootScreen({super.key});
 
@@ -17,14 +18,18 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   final TransactionService transactionService = TransactionService();
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    transactionService.loadTransactions();
+    // Carga inicial de transacciones
+    transactionService.loadTransactions().then((_) {
+      setState(() {});
+    });
   }
 
-  void _openForm(BuildContext context, TransactionType type) async {
+  Future<void> _openForm(BuildContext context, TransactionType type) async {
     final tx = await Navigator.push<Transaction?>(
       context,
       MaterialPageRoute(builder: (_) => TransactionForm(type: type)),
@@ -43,7 +48,8 @@ class _RootScreenState extends State<RootScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
+              leading:
+                  const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
               title: const Text('Agregar Gasto'),
               onTap: () {
                 Navigator.pop(context);
@@ -51,11 +57,41 @@ class _RootScreenState extends State<RootScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.add_circle, color: AppTheme.incomeColor),
+              leading:
+                  const Icon(Icons.add_circle, color: AppTheme.incomeColor),
               title: const Text('Agregar Ingreso'),
               onTap: () {
                 Navigator.pop(context);
                 _openForm(context, TransactionType.income);
+              },
+            ),
+            // Presupuesto Mensual
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet),
+              title: const Text('Presupuesto Mensual'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const BudgetForm(),
+                  ),
+                );
+              },
+            ),
+
+            // Meta de Ahorro
+            ListTile(
+              leading: const Icon(Icons.flag),
+              title: const Text('Meta de Ahorro'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const GoalsForm(),
+                  ),
+                );
               },
             ),
           ],
@@ -64,13 +100,16 @@ class _RootScreenState extends State<RootScreen> {
     );
   }
 
-  int _currentIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(transactionService: transactionService),
-      TransactionsViewScreen(transactions: transactionService.getAllTransactions()),
+      HomeScreen(
+        transactionService: transactionService,
+      ),
+      TransactionsViewScreen(
+        transactions: transactionService.getAllTransactions(),
+        save:         transactionService.saveTransactions,
+      ),
       const ProfileScreen(),
       const SettingsScreen(),
     ];
@@ -81,23 +120,23 @@ class _RootScreenState extends State<RootScreen> {
         currentIndex: _currentIndex,
         selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
         type: BottomNavigationBarType.fixed,
+        onTap: (index) => setState(() => _currentIndex = index),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'transacciones'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configuración'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard), label: 'Inicio'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart), label: 'Transacciones'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Configuración'),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMenu(context),
-        shape: const CircleBorder(),
         child: const Icon(Icons.add),
       ),
     );

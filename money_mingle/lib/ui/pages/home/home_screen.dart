@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-//import 'package:money_mingle/app_theme.dart';
-//import 'package:money_mingle/models/transaction.dart';
 import 'package:money_mingle/domain/services/transaction_service.dart';
 import 'widgets/info_card.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/monthly_summary.dart';
-//import 'widgets/goals_card.dart';
+import 'widgets/goals_card.dart';
 import 'widgets/graphs/expense_line_chart.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -15,6 +13,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Cálculo del balance neto
+    final net = transactionService.totalIncome - transactionService.totalExpense;
     final expensesByDay = transactionService.getExpensesByDay();
 
     return Scaffold(
@@ -27,27 +27,45 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              '\$${net.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 16),
             ExpenseLineChart(expenses: expensesByDay),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InfoCard(
-                  title: 'Income',
+                  title: 'Ingresos',
                   value: '\$${transactionService.totalIncome.toStringAsFixed(2)}',
                   color: Colors.green,
                 ),
                 InfoCard(
-                  title: 'Expenses',
+                  title: 'Gastos',
                   value: '\$${transactionService.totalExpense.toStringAsFixed(2)}',
                   color: Colors.red,
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            RecentTransactions(transactions: transactionService.getAllTransactions()),
+
+            RecentTransactions(
+              transactions: transactionService.getAllTransactions(),
+            ),
             const SizedBox(height: 8),
-            MonthlySummary(transactions: transactionService.getAllTransactions()),
+            MonthlySummary(
+              transactions: transactionService.getAllTransactions(),
+            ),
+            const SizedBox(height: 8),
+            GoalsCard(
+              transactions: transactionService.getAllTransactions(),
+            ),
           ],
         ),
       ),
