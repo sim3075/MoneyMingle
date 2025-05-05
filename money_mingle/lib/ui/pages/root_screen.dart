@@ -11,46 +11,49 @@ class RootScreen extends StatefulWidget {
 
   @override
   State<RootScreen> createState() => _RootScreenState();
-
 }
 
 class _RootScreenState extends State<RootScreen> {
-
   void _openForm(BuildContext context, TransactionType type) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => TransactionForm(type: type),
-      ),
+      MaterialPageRoute(builder: (_) => TransactionForm(type: type)),
     );
   }
 
   void _showAddMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
-              title: const Text('Agregar Gasto'),
-              onTap: () {
-                Navigator.pop(context);
-                _openForm(context, TransactionType.expense);
-              },
+      builder:
+          (_) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Icons.remove_circle,
+                    color: AppTheme.expenseColor,
+                  ),
+                  title: const Text('Agregar Gasto'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _openForm(context, TransactionType.expense);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.add_circle,
+                    color: AppTheme.incomeColor,
+                  ),
+                  title: const Text('Agregar Ingreso'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _openForm(context, TransactionType.income);
+                  },
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.add_circle, color: AppTheme.incomeColor),
-              title: const Text('Agregar Ingreso'),
-              onTap: () {
-                Navigator.pop(context);
-                _openForm(context, TransactionType.income);
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -58,9 +61,9 @@ class _RootScreenState extends State<RootScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    StatsScreen(),
     TransactionScreen(),
     ProfileScreen(),
+    StatsScreen(),
   ];
 
   @override
@@ -78,11 +81,10 @@ class _RootScreenState extends State<RootScreen> {
         },
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Estadísticas'),
-          BottomNavigationBarItem(icon: SizedBox(width: 40), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Agregar'),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Transacciones'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configuraciones'),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

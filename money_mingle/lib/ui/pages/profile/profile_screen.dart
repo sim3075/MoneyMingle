@@ -26,7 +26,7 @@ class ProfileScreen extends StatelessWidget {
                     const Center(
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: AssetImage('assets/images/user_avatar.png'), // Cambia por la ruta de tu imagen
+                        backgroundImage: AssetImage(r'lib\assets\images\usuario.png'),
                       ),
                     ),
                     const SizedBox(height: 16),

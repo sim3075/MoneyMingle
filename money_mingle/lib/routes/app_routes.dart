@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:money_mingle/ui/pages/RootScreen.dart';
+import 'package:money_mingle/ui/pages/root_screen.dart';
 import 'package:money_mingle/ui/pages/auth/forgot_password_screen.dart';
 import 'package:money_mingle/ui/pages/auth/register_screen.dart';
 import 'package:money_mingle/ui/pages/auth/login_screen.dart';
