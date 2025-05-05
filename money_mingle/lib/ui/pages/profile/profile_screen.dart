@@ -10,6 +10,7 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Perfil'),
+        automaticallyImplyLeading: false,
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -26,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
                     const Center(
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: AssetImage(r'lib\assets\images\usuario.png'),
+                        backgroundImage: AssetImage('lib/assets/images/usuario.png'),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -59,24 +60,24 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     const Divider(),
                     const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/login');
-                      },
-                      icon: const FaIcon(FontAwesomeIcons.rightFromBracket, color: Colors.red),
-                      label: const Text(
-                        'Cerrar Sesión',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.red, width: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                    ),
+                    // ElevatedButton.icon(
+                    //   onPressed: () {
+                    //     Navigator.pushNamed(context, '/login');
+                    //   },
+                    //   icon: const FaIcon(FontAwesomeIcons.rightFromBracket, color: Colors.red),
+                    //   label: const Text(
+                    //     'Cerrar Sesión',
+                    //     style: TextStyle(color: Colors.red),
+                    //   ),
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.white,
+                    //     side: const BorderSide(color: Colors.red, width: 2),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(8),
+                    //     ),
+                    //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mingle/domain/services/transaction_service.dart';
 import 'package:money_mingle/ui/pages/root_screen.dart';
 import 'package:money_mingle/ui/pages/auth/forgot_password_screen.dart';
 import 'package:money_mingle/ui/pages/auth/register_screen.dart';
@@ -19,7 +20,7 @@ class AppRoutes {
       login: (context) => LoginScreen(),
       register: (context) => RegisterScreen(),
       forgotPassword: (context) => ForgotPasswordScreen(),
-      home: (context) => HomeScreen(),
+      home: (context) => HomeScreen(transactionService: TransactionService()),
       profile: (context) => ProfileScreen(),
       rootScreen: (context) => RootScreen()
     };

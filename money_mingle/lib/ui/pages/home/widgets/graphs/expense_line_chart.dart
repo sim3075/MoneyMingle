@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class ExpenseLineChart extends StatelessWidget {
-  final List<double> expenses; // Lista de gastos por día
+  final List<double> expenses;
 
   const ExpenseLineChart({
     super.key,
@@ -12,7 +12,7 @@ class ExpenseLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 250, // Altura del gráfico
+      height: 250,
       child: LineChart(
         LineChartData(
           maxY: 1200, // Máximo valor en el eje Y
@@ -45,8 +45,8 @@ class ExpenseLineChart extends StatelessWidget {
           ),
           gridData: FlGridData(
             show: true,
-            horizontalInterval: 300, // Líneas horizontales espaciadas
-            verticalInterval: 10, // Líneas verticales espaciadas
+            horizontalInterval: 300,
+            verticalInterval: 10,
           ),
           borderData: FlBorderData(
             show: true,
@@ -61,7 +61,7 @@ class ExpenseLineChart extends StatelessWidget {
                 expenses.length,
                 (index) => FlSpot(index.toDouble() + 1, expenses[index]),
               ),
-              isCurved: true, // Hace la línea curva
+              isCurved: true,
               color: Colors.red,
               barWidth: 3,
               isStrokeCapRound: true,
@@ -69,7 +69,7 @@ class ExpenseLineChart extends StatelessWidget {
                 show: true,
                 color: Colors.red.withOpacity(0.2),
               ),
-              dotData: FlDotData(show: false), // Oculta los puntos
+              dotData: FlDotData(show: false),
             ),
           ],
         ),
