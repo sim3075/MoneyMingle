@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:money_mingle/models/transaction.dart';
-import 'package:money_mingle/ui/widgets/shared/custom_button.dart';
 import '../transaction/transaction_controller.dart';
 import 'widgets/date_filter_selector.dart';
 import 'widgets/category_filter_selector.dart';
@@ -16,6 +15,52 @@ class TransactionsViewScreen extends StatelessWidget {
     required this.transactions,
     required this.save,
   }) : super(key: key);
+
+  void _showExportPdfDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Exportar PDF'),
+        content: const Text('Exportar historial de transacciones a PDF.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () {
+              // TODO: implementar exportación real
+              Navigator.pop(context);
+            },
+            child: const Text('EXPORTAR'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExportExcelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Exportar Excel'),
+        content: const Text('Exportar historial de transacciones a Excel.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () {
+              // TODO: implementar exportación real
+              Navigator.pop(context);
+            },
+            child: const Text('EXPORTAR'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +104,37 @@ class TransactionsViewScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                CustomButton(
-                  text: 'Exportar PDF Transacciones',
-                  onPressed: () {
-                    // TODO: implementar la acción de exportar PDF
-                  },
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Tooltip(
+                          message: 'Exportar PDF',
+                          child: IconButton(
+                            icon: const Icon(Icons.picture_as_pdf),
+                            color: Colors.green.shade800,
+                            onPressed: () => _showExportPdfDialog(context),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Tooltip(
+                          message: 'Exportar Excel',
+                          child: IconButton(
+                            icon: const Icon(Icons.table_chart),
+                            color: Colors.green.shade800,
+                            onPressed: () => _showExportExcelDialog(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
