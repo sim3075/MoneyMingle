@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:money_mingle/app_theme.dart';
 import 'package:money_mingle/models/transaction.dart';
-import '../transaction/transaction_form.dart';
+import 'package:money_mingle/ui/pages/home/home_controller.dart';
 import 'widgets/info_card.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/monthly_summary.dart';
+import 'widgets/goals_card.dart';
 import '../../widgets/shared/app_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,91 +16,65 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Transaction> _transactions = [];
+  late final HomeController controller;
 
   @override
   void initState() {
     super.initState();
-    _loadTransactions();
+    controller = HomeController()
+      ..addListener(() => setState(() {}))
+      ..loadTransactions();
   }
 
-  Future<void> _loadTransactions() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('transactions');
-    if (raw != null) {
-      setState(() => _transactions = Transaction.listFromJson(raw));
-    }
-  }
-
-  Future<void> _saveTransactions() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      'transactions',
-      Transaction.listToJson(_transactions),
-    );
-  }
-
-  double get _totalIncome => _transactions
-      .where((t) => t.type == TransactionType.income)
-      .fold(0, (sum, t) => sum + t.amount);
-
-  double get _totalExpense => _transactions
-      .where((t) => t.type == TransactionType.expense)
-      .fold(0, (sum, t) => sum + t.amount);
-
-  Future<void> _openForm(BuildContext ctx, TransactionType type) async {
-    final Transaction? tx = await Navigator.push<Transaction?>(
-      ctx,
-      MaterialPageRoute(builder: (_) => TransactionForm(type: type)),
-    );
-    if (tx != null) {
-      setState(() {
-        _transactions.add(tx);
-      });
-      await _saveTransactions();
-    }
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   void _showAddMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(
-            leading:
-                const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
-            title: const Text('Agregar Gasto'),
-            onTap: () {
-              Navigator.pop(context);
-              _openForm(context, TransactionType.expense);
-            },
-          ),
-          ListTile(
-            leading:
-                const Icon(Icons.add_circle, color: AppTheme.incomeColor),
-            title: const Text('Agregar Ingreso'),
-            onTap: () {
-              Navigator.pop(context);
-              _openForm(context, TransactionType.income);
-            },
-          ),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading:
+                  const Icon(Icons.remove_circle, color: AppTheme.expenseColor),
+              title: const Text('Agregar Gasto'),
+              onTap: () {
+                Navigator.pop(context);
+                controller.openForm(context, TransactionType.expense);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.add_circle, color: AppTheme.incomeColor),
+              title: const Text('Agregar Ingreso'),
+              onTap: () {
+                Navigator.pop(context);
+                controller.openForm(context, TransactionType.income);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final net = _totalIncome - _totalExpense;
+    final net = controller.totalIncome - controller.totalExpense;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Abril 2024')),
       drawer: AppDrawer(
-        totalIncome:           _totalIncome,
-        totalExpense:          _totalExpense,
-        transactions:          _transactions,
-        save:                  _saveTransactions,
-        onTransactionsChanged: _loadTransactions,  // <-- Aquí
+        totalIncome:           controller.totalIncome,
+        totalExpense:          controller.totalExpense,
+        transactions:          controller.transactions,
+        save:                  controller.saveTransactions,
+        onTransactionsChanged: controller.loadTransactions,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMenu(context),
@@ -108,31 +82,41 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            '\$${net.toStringAsFixed(2)}',
-            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            InfoCard(
-              title: 'Ingresos',
-              value: '\$${_totalIncome.toStringAsFixed(2)}',
-              color: AppTheme.incomeColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '\$${net.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            InfoCard(
-              title: 'Gastos',
-              value: '\$${_totalExpense.toStringAsFixed(2)}',
-              color: AppTheme.expenseColor,
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InfoCard(
+                  title: 'Ingresos',
+                  value: '\$${controller.totalIncome.toStringAsFixed(2)}',
+                  color: AppTheme.incomeColor,
+                ),
+                InfoCard(
+                  title: 'Gastos',
+                  value: '\$${controller.totalExpense.toStringAsFixed(2)}',
+                  color: AppTheme.expenseColor,
+                ),
+              ],
             ),
-          ]),
-          const SizedBox(height: 16),
-          RecentTransactions(transactions: _transactions),
-          const SizedBox(height: 8),
-          MonthlySummary(transactions: _transactions),
-        ]),
+            const SizedBox(height: 16),
+            RecentTransactions(transactions: controller.transactions),
+            const SizedBox(height: 8),
+            MonthlySummary(transactions: controller.transactions),
+            const SizedBox(height: 8),
+            GoalsCard(transactions: controller.transactions),
+          ],
+        ),
       ),
     );
   }
 }
-
