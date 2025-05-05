@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:money_mingle/ui/pages/auth/forgot_password_screen.dart';
-import 'package:money_mingle/ui/pages/auth/register_screen.dart';
-import 'package:money_mingle/ui/pages/home/home_screen.dart';
-import 'ui/pages/auth/login_screen.dart';
-import 'app_theme.dart';
+import 'package:money_mingle/app_theme.dart';
+import 'package:money_mingle/routes/app_routes.dart';
+//import 'package:money_mingle/ui/widgets/shared/navigation_bar.dart';
 
 void main() {
   runApp(const MoneyMingleApp());
@@ -17,14 +15,9 @@ class MoneyMingleApp extends StatelessWidget {
     return MaterialApp(
       title: 'MoneyMingle',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme, 
-      initialRoute: '/login', 
-      routes: {
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/forgot-password': (context) => ForgotPasswordScreen(),
-        '/home': (context) => HomeScreen(),
-      },
+      theme: AppTheme.lightTheme,
+      initialRoute: AppRoutes.login,
+      routes: AppRoutes.getRoutes(),
     );
   }
 }
