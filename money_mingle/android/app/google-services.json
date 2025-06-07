@@ -12,7 +12,20 @@
           "package_name": "com.example.money_mingle"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "573116276939-fts95fb0igl889f9nfbjsndqbe31o8j6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.money_mingle",
+            "certificate_hash": "190572aaabf70e57826673a53c9113f14ca95462"
+          }
+        },
+        {
+          "client_id": "573116276939-l89sh3uobe9faotf0qo31tdb9nuoej91.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB1XEoASgT8y2BwzvKtHWY8cu-EMi53YBc"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573116276939-l89sh3uobe9faotf0qo31tdb9nuoej91.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "573116276939-l64tvpl8fass7rnr2lksi16b95k197a2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.moneyMingle"
+              }
+            }
+          ]
         }
       }
     }

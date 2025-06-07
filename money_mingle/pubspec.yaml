@@ -37,6 +37,7 @@ dependencies:
   riverpod_annotation: ^2.6.1
   intl: ^0.18.0
   font_awesome_flutter: ^10.5.0
+  sign_in_button: ^3.0.0
   # Used for creating beautiful and customizable charts in the application.
   fl_chart: ^0.71.0
 
