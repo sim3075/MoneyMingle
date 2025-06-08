@@ -85,6 +85,29 @@ class LoginScreen extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 16),
+              CustomButton(
+                text: 'Iniciar sesión con Google',
+                // icon: Icons.g_mobiledata, // O usa un widget con el logo de Google
+                onPressed: () async {
+                  final authService = ref.read(authServiceProvider);
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => const Center(child: CircularProgressIndicator()),
+                  );
+                  try {
+                    await authService.signInWithGoogle();
+                    Navigator.pop(context); // Quita el loader
+                    Navigator.pushReplacementNamed(context, '/root-screen');
+                  } on FirebaseAuthException catch (e) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.message ?? 'Error al iniciar sesión con Google')),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
