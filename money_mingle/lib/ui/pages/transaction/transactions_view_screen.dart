@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:money_mingle/models/transaction.dart';
-import '../transaction/transaction_controller.dart';
+import 'package:money_mingle/ui/pages/transaction/transaction_controller.dart';
 import 'widgets/date_filter_selector.dart';
 import 'widgets/category_filter_selector.dart';
 import 'widgets/transaction_list.dart';
@@ -29,7 +29,6 @@ class TransactionsViewScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              // TODO: implementar exportación real
               Navigator.pop(context);
             },
             child: const Text('EXPORTAR'),
@@ -40,6 +39,8 @@ class TransactionsViewScreen extends StatelessWidget {
   }
 
   void _showExportExcelDialog(BuildContext context) {
+    final ctrl = Provider.of<TransactionsController>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -51,9 +52,9 @@ class TransactionsViewScreen extends StatelessWidget {
             child: const Text('CANCELAR'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: implementar exportación real
+            onPressed: () async {
               Navigator.pop(context);
+              await ctrl.exportToExcel(context);
             },
             child: const Text('EXPORTAR'),
           ),
@@ -70,7 +71,7 @@ class TransactionsViewScreen extends StatelessWidget {
         save: save,
       )..loadTransactions(),
       child: Consumer<TransactionsController>(
-        builder: (ctx, ctrl, _) => Scaffold(
+        builder: (context, ctrl, _) => Scaffold(
           appBar: AppBar(
             title: const Text('Transacciones'),
             automaticallyImplyLeading: false,
@@ -81,26 +82,26 @@ class TransactionsViewScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 DateFilterSelector(
-                  filter:         ctrl.dateFilter,
-                  selectedDate:   ctrl.selectedDate,
-                  onFilterChanged:(f) => ctrl.dateFilter = f,
-                  onDateChanged:  (d) => ctrl.selectedDate = d,
+                  filter: ctrl.dateFilter,
+                  selectedDate: ctrl.selectedDate,
+                  onFilterChanged: (f) => ctrl.dateFilter = f,
+                  onDateChanged: (d) => ctrl.selectedDate = d,
                 ),
                 const SizedBox(height: 16),
                 CategoryFilterSelector(
-                  selected:   ctrl.selectedCategory,
+                  selected: ctrl.selectedCategory,
                   categories: [
                     ...ctrl.expenseCategories,
                     ...ctrl.incomeCategories,
                   ],
-                  onChanged:  (c) => ctrl.selectedCategory = c,
+                  onChanged: (c) => ctrl.selectedCategory = c,
                 ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: TransactionsList(
-                    items:    ctrl.filtered,
-                    onEdit:   (tx) => ctrl.edit(ctx, tx),
-                    onDelete: (tx) => ctrl.delete(ctx, tx),
+                    items: ctrl.filtered,
+                    onEdit: (tx) => ctrl.edit(context, tx),
+                    onDelete: (tx) => ctrl.delete(context, tx),
                   ),
                 ),
                 const SizedBox(height: 16),

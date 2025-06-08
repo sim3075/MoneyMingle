@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 import 'package:money_mingle/models/transaction.dart';
 import 'package:money_mingle/ui/pages/transaction/transaction_form.dart';
 import 'package:money_mingle/ui/pages/transaction/widgets/date_filter_selector.dart';
@@ -12,13 +16,13 @@ class TransactionsController extends ChangeNotifier {
     required this.save,
   });
 
-  DateFilter _dateFilter   = DateFilter.day;
-  DateTime   _selectedDate = DateTime.now();
-  String?    _selectedCategory;
+  DateFilter _dateFilter = DateFilter.day;
+  DateTime _selectedDate = DateTime.now();
+  String? _selectedCategory;
 
-  DateFilter get dateFilter       => _dateFilter;
-  DateTime   get selectedDate     => _selectedDate;
-  String?    get selectedCategory => _selectedCategory;
+  DateFilter get dateFilter => _dateFilter;
+  DateTime get selectedDate => _selectedDate;
+  String? get selectedCategory => _selectedCategory;
 
   set dateFilter(DateFilter f) {
     _dateFilter = f;
@@ -34,6 +38,7 @@ class TransactionsController extends ChangeNotifier {
     _selectedCategory = c;
     notifyListeners();
   }
+
   List<String> get expenseCategories => const [
         'Alimentación',
         'Transporte',
@@ -64,31 +69,27 @@ class TransactionsController extends ChangeNotifier {
               d.day == _selectedDate.day;
           break;
         case DateFilter.week:
-          final start =
-              _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
+          final start = _selectedDate.subtract(
+              Duration(days: _selectedDate.weekday - 1));
           final end = start.add(const Duration(days: 6));
           byDate = (d.isAtSameMomentAs(start) || d.isAfter(start)) &&
               (d.isAtSameMomentAs(end) || d.isBefore(end));
           break;
         case DateFilter.month:
-          byDate =
-              d.year == _selectedDate.year && d.month == _selectedDate.month;
+          byDate = d.year == _selectedDate.year && d.month == _selectedDate.month;
           break;
         case DateFilter.year:
           byDate = d.year == _selectedDate.year;
           break;
       }
-      final byCategory =
-          _selectedCategory == null || tx.category == _selectedCategory;
+      final byCategory = _selectedCategory == null || tx.category == _selectedCategory;
       return byDate && byCategory;
     }).toList();
   }
 
-
   Future<void> loadTransactions() async {
     notifyListeners();
   }
-
 
   Future<void> openForm(BuildContext ctx, TransactionType type) async {
     final tx = await Navigator.push<Transaction?>(
@@ -125,11 +126,13 @@ class TransactionsController extends ChangeNotifier {
         content: const Text('¿Seguro que deseas eliminarla?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Eliminar')),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );
@@ -137,6 +140,46 @@ class TransactionsController extends ChangeNotifier {
       transactions.remove(tx);
       await save();
       notifyListeners();
+    }
+  }
+}
+
+extension TransactionExportExcel on TransactionsController {
+  Future<void> exportToExcel(BuildContext context) async {
+    try {
+      final excel = Excel.createExcel();
+      final sheet = excel['Transacciones'];
+      sheet.appendRow([
+        'Tipo', 'Título', 'Monto', 'Fecha', 'Categoría', 'Nota', 'Fijo',
+      ]);
+      for (final tx in transactions) {
+        sheet.appendRow([
+          tx.type == TransactionType.expense ? 'Gasto' : 'Ingreso',
+          tx.title,
+          tx.amount.toStringAsFixed(2),
+          tx.date.toIso8601String(),
+          tx.category ?? '',
+          tx.note ?? '',
+          tx.isFixed ? 'Sí' : 'No',
+        ]);
+      }
+
+      final dir = await getExternalStorageDirectory();
+      final now = DateTime.now();
+      final stamp = DateFormat('yyyyMMdd_HHmmss').format(now);
+      final filePath = '${dir!.path}/transacciones_$stamp.xlsx';
+
+      final bytes = excel.encode();
+      final file = File(filePath);
+      await file.writeAsBytes(bytes!);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Archivo guardado en:\n$filePath')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al exportar: $e')),
+      );
     }
   }
 }
