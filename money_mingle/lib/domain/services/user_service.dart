@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:money_mingle/models/user.dart';
 
@@ -16,5 +19,28 @@ class UserService {
       return User.fromMap(doc.data()!, doc.id);
     }
     return null;
+  }
+
+  /// Actualiza un campo específico del usuario
+  Future<void> updateUserField(String uid, String field, dynamic value) async {
+    await _usersRef.doc(uid).update({field: value});
+  }
+
+  /// Sube una nueva foto de perfil y actualiza el campo photoUrl en Firestore
+  Future<String?> updateProfilePhoto(String uid) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+
+    if (pickedFile == null) return null;
+
+    final file = File(pickedFile.path);
+    final storageRef = FirebaseStorage.instance.ref().child('profile_photos/$uid.jpg');
+
+    final uploadTask = storageRef.putFile(file);
+    final snapshot = await uploadTask; // Espera correctamente la subida
+    final downloadUrl = await snapshot.ref.getDownloadURL();
+
+    await _usersRef.doc(uid).update({'photoUrl': downloadUrl});
+    return downloadUrl;
   }
 }

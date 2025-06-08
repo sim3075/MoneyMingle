@@ -58,7 +58,6 @@ class LoginScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              // Botón de inicio de sesión con lógica de autenticación
               CustomButton(
                 text: 'Iniciar Sesión',
                 onPressed: () async {
@@ -87,7 +86,6 @@ class LoginScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               CustomButton(
                 text: 'Iniciar sesión con Google',
-                // icon: Icons.g_mobiledata, // O usa un widget con el logo de Google
                 onPressed: () async {
                   final authService = ref.read(authServiceProvider);
                   showDialog(
