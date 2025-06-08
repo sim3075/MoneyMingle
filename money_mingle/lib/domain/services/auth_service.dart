@@ -5,7 +5,6 @@ import 'package:money_mingle/models/user.dart' as app_model;
 import 'package:money_mingle/providers/user_provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-// Dentro de tu función de registro (por ejemplo, en tu pantalla de registro)
 Future<void> registerUser(WidgetRef ref, fb.User firebaseUser) async {
   final userService = ref.read(userServiceProvider);
 

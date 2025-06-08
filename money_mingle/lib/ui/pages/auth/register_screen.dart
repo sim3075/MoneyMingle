@@ -25,19 +25,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Crear cuenta"),
-      ),
+      appBar: AppBar(title: const Text("Crear cuenta")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Bienvenido a MoneyMingle 👋",
-                style: theme.textTheme.headlineSmall),
+            Text(
+              "Bienvenido a MoneyMingle 👋",
+              style: theme.textTheme.headlineSmall,
+            ),
             const SizedBox(height: 8),
-            Text("Crea tu cuenta para comenzar a gestionar tus finanzas.",
-                style: theme.textTheme.bodyMedium),
+            Text(
+              "Crea tu cuenta para comenzar a gestionar tus finanzas.",
+              style: theme.textTheme.bodyMedium,
+            ),
             const SizedBox(height: 24),
 
             TextField(
@@ -47,7 +49,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Correo electrónico"),
+              decoration: const InputDecoration(
+                labelText: "Correo electrónico",
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -59,7 +63,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             TextField(
               controller: confirmController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: "Confirmar contraseña"),
+              decoration: const InputDecoration(
+                labelText: "Confirmar contraseña",
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -70,7 +76,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 onPressed: () async {
                   if (passwordController.text != confirmController.text) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Las contraseñas no coinciden")),
+                      const SnackBar(
+                        content: Text("Las contraseñas no coinciden"),
+                      ),
                     );
                     return;
                   }
@@ -78,20 +86,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder: (_) => const Center(child: CircularProgressIndicator()),
+                    builder:
+                        (_) => const Center(child: CircularProgressIndicator()),
                   );
                   try {
                     final cred = await authService.register(
                       emailController.text.trim(),
                       passwordController.text.trim(),
                     );
-                    await registerUser(ref, cred.user!); // Guarda datos extra en Firestore
-                    Navigator.pop(context); // Quita loader
+                    await registerUser(ref, cred.user!);
+                    Navigator.pop(context);
                     Navigator.pushReplacementNamed(context, '/root-screen');
                   } on FirebaseAuthException catch (e) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.message ?? 'Error al registrar')),
+                      SnackBar(
+                        content: Text(e.message ?? 'Error al registrar'),
+                      ),
                     );
                   }
                 },
