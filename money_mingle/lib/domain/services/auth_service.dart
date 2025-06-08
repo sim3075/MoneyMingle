@@ -36,6 +36,10 @@ class AuthService {
   Future<fb.UserCredential> register(String email, String password) async {
     return await _auth.createUserWithEmailAndPassword(email: email, password: password);
   }
+  // Restablecer contraseña
+  Future<void> resetPassword(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
 
   // Iniciar sesión con Google
   Future<fb.UserCredential> signInWithGoogle() async {
