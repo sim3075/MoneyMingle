@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:money_mingle/app_theme.dart';
 import 'package:money_mingle/routes/app_routes.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-void main() {
-  runApp(const MoneyMingleApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const ProviderScope(child: MoneyMingleApp()));
 }
 
 class MoneyMingleApp extends StatelessWidget {
