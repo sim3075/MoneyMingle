@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:money_mingle/app_theme.dart';
+import 'package:money_mingle/providers/auth_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     return Scaffold(
       appBar: AppBar(
@@ -75,8 +77,10 @@ class SettingsScreen extends StatelessWidget {
                       child: const Text('Cancelar'),
                     ),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
+                        final authService = ref.read(authServiceProvider);
+                        await authService.signOut();
                         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
                       },
                       child: const Text('Cerrar Sesión'),
