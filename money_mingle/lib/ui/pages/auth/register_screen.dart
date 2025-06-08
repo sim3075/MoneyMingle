@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:money_mingle/domain/services/auth_service.dart';
 import 'package:money_mingle/providers/auth_providers.dart';
-//import 'package:money_mingle/providers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:money_mingle/models/user.dart' as app_model;
 import 'package:money_mingle/ui/widgets/shared/custom_button.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
