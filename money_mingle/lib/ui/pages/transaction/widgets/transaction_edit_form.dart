@@ -61,7 +61,7 @@ class _TransactionEditFormState extends State<TransactionEditForm> {
       date: _selectedDate ?? DateTime.now(),
       category: _selectedCategory,
       note: _noteController.text.trim(),
-      receiptPath: widget.transaction.receiptPath,
+      receiptPath: widget.transaction.receiptPath, // No se edita
       isFixed: _isFixed,
     );
     Navigator.of(context).pop(updatedTx);
