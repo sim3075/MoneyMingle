@@ -75,14 +75,7 @@ class HomeScreen extends ConsumerWidget {
                 RecentTransactions(
                   transactions: transactionService.getAllTransactions(),
                 ),
-                const SizedBox(height: 8),
-                MonthlySummary(
-                  transactions: transactionService.getAllTransactions(),
-                ),
-                const SizedBox(height: 8),
-                GoalsCard(
-                  transactions: transactionService.getAllTransactions(),
-                ),
+                
               ],
             ),
           ),

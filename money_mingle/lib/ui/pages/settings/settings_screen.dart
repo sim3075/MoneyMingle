@@ -17,41 +17,8 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          ListTile(
-            leading: Icon(Icons.palette_outlined, color: AppTheme.primaryColor),
-            title: const Text('Cambiar Tema'),
-            subtitle: const Text('Claro / Oscuro'),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text('Cambiar Tema'),
-                  content: const Text('¿Deseas cambiar al tema oscuro?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancelar'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Aceptar'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: Icon(Icons.notifications_outlined, color: AppTheme.primaryColor),
-            title: const Text('Notificaciones'),
-            subtitle: const Text('Administrar notificaciones'),
-            onTap: () {
-
-            },
-          ),
+          
+          
           const Divider(),
           ListTile(
             leading: Icon(Icons.lock_outline, color: AppTheme.primaryColor),
