@@ -1,10 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:money_mingle/models/transaction.dart' as my_models;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:money_mingle/models/transaction.dart' as my_models;
+
+// Excel & PDF exports
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
 
 class TransactionService {
   List<my_models.Transaction> _transactions = [];
@@ -113,7 +121,6 @@ class TransactionService {
           .collection('transactions')
           .doc(tx.id)
           .update(tx.toMap());
-      // Actualiza en la lista local
       final index = _transactions.indexWhere((t) => t.id == tx.id);
       if (index != -1) {
         _transactions[index] = tx;
@@ -127,8 +134,7 @@ class TransactionService {
     final storageRef = FirebaseStorage.instance
         .ref()
         .child('users/$uid/receipts/${DateTime.now().millisecondsSinceEpoch}_${image.name}');
-    final uploadTask = storageRef.putFile(File(image.path));
-    final snapshot = await uploadTask;
+    final snapshot = await storageRef.putFile(File(image.path));
     return await snapshot.ref.getDownloadURL();
   }
 
@@ -138,7 +144,66 @@ class TransactionService {
       final ref = FirebaseStorage.instance.refFromURL(url);
       await ref.delete();
     } catch (_) {
-      // Si falla, ignora (puede que ya no exista)
+      // Si falla, ignora
     }
+  }
+
+  /// Exporta todas las transacciones como Excel en el sandbox y retorna la ruta
+  Future<String> exportToExcel() async {
+    final excel = Excel.createExcel();
+    final sheet = excel['Transacciones'];
+    sheet.appendRow([
+      'Tipo', 'Título', 'Monto', 'Fecha', 'Categoría', 'Nota', 'Fijo'
+    ]);
+    for (final tx in _transactions) {
+      sheet.appendRow([
+        tx.type == my_models.TransactionType.expense ? 'Gasto' : 'Ingreso',
+        tx.title,
+        tx.amount.toStringAsFixed(2),
+        tx.date.toIso8601String(),
+        tx.category ?? '',
+        tx.note ?? '',
+        tx.isFixed ? 'Sí' : 'No',
+      ]);
+    }
+    final dir = await getApplicationDocumentsDirectory();
+    final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    final filePath = '${dir.path}/transacciones_$stamp.xlsx';
+    final bytes = excel.encode();
+    await File(filePath).writeAsBytes(bytes!);
+    return filePath;
+  }
+
+  /// Exporta todas las transacciones como PDF en el sandbox y retorna la ruta
+  Future<String> exportToPdf() async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context ctx) => [
+          pw.Header(level: 0, child: pw.Text('Historial de Transacciones')),
+          pw.Table.fromTextArray(
+            headers: [
+              'Tipo', 'Título', 'Monto', 'Fecha', 'Categoría', 'Nota', 'Fijo'
+            ],
+            data: _transactions.map((tx) => [
+              tx.type == my_models.TransactionType.expense ? 'Gasto' : 'Ingreso',
+              tx.title,
+              tx.amount.toStringAsFixed(2),
+              DateFormat('yyyy-MM-dd').format(tx.date),
+              tx.category ?? '',
+              tx.note ?? '',
+              tx.isFixed ? 'Sí' : 'No',
+            ]).toList(),
+          ),
+        ],
+      ),
+    );
+    final dir = await getApplicationDocumentsDirectory();
+    final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    final filePath = '${dir.path}/transacciones_$stamp.pdf';
+    final file = File(filePath);
+    await file.writeAsBytes(await pdf.save());
+    return filePath;
   }
 }

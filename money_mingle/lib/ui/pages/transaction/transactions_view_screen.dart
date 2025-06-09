@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:money_mingle/models/transaction.dart';
 import 'package:money_mingle/providers/transaction_providers.dart';
-import 'package:money_mingle/ui/pages/transaction/widgets/transaction_edit_form.dart';
 import 'widgets/category_filter_selector.dart';
 import 'widgets/date_filter_selector.dart';
 import 'widgets/transaction_list.dart';
+import 'package:money_mingle/ui/pages/transaction/widgets/transaction_edit_form.dart';
 
 class TransactionsViewScreen extends ConsumerStatefulWidget {
   const TransactionsViewScreen({Key? key}) : super(key: key);
@@ -17,7 +17,6 @@ class TransactionsViewScreen extends ConsumerStatefulWidget {
 class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen> {
   bool _loading = true;
 
-  // Filtros locales para la vista
   DateTime? _selectedDate;
   String? _selectedCategory;
   DateFilter _dateFilter = DateFilter.day;
@@ -38,7 +37,7 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
     final txService = ref.watch(transactionServiceProvider);
     var transactions = txService.transactions;
 
-    // Aplica filtros locales
+    // Filtros locales
     if (_selectedCategory != null && _selectedCategory!.isNotEmpty) {
       transactions = transactions.where((tx) => tx.category == _selectedCategory).toList();
     }
@@ -70,22 +69,23 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
               filter: _dateFilter,
               selectedDate: _selectedDate ?? DateTime.now(),
               onFilterChanged: (f) => setState(() => _dateFilter = f),
-              onDateChanged: (d) => setState(() => _selectedDate = d),
+              onDateChanged:   (d) => setState(() => _selectedDate = d),
             ),
             const SizedBox(height: 16),
             CategoryFilterSelector(
-              selected: _selectedCategory,
+              selected:   _selectedCategory,
               categories: [
-                'Alimentación','Transporte','Vivienda','Servicios','Salud','Ocio','Compras','Imprevistos',
-                'Sueldo','Freelance','Inversiones','Regalos','Otros',
+                'Alimentación','Transporte','Vivienda','Servicios','Salud',
+                'Ocio','Compras','Imprevistos','Sueldo','Freelance',
+                'Inversiones','Regalos','Otros',
               ],
-              onChanged: (c) => setState(() => _selectedCategory = c),
+              onChanged:  (c) => setState(() => _selectedCategory = c),
             ),
             const SizedBox(height: 24),
             Expanded(
               child: TransactionsList(
                 items: transactions,
-                onEdit: (tx) async {
+                 onEdit: (tx) async {
                   final updated = await Navigator.push<Transaction?>(
                     context,
                     MaterialPageRoute(
@@ -97,7 +97,7 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
                     setState(() {});
                   }
                 },
-                onDelete: (tx) async {
+                 onDelete: (tx) async {
                   await ref.read(transactionServiceProvider).deleteTransaction(tx);
                   setState(() {});
                 },
@@ -115,22 +115,18 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Tooltip(
-                      message: 'Exportar PDF',
-                      child: IconButton(
-                        icon: const Icon(Icons.picture_as_pdf),
-                        color: Colors.green.shade800,
-                        onPressed: () => _showExportPdfDialog(context),
-                      ),
+                    IconButton(
+                      tooltip: 'Exportar PDF',
+                      icon: const Icon(Icons.picture_as_pdf),
+                      color: Colors.green.shade800,
+                      onPressed: () => _exportPdf(context),
                     ),
                     const SizedBox(height: 8),
-                    Tooltip(
-                      message: 'Exportar Excel',
-                      child: IconButton(
-                        icon: const Icon(Icons.table_chart),
-                        color: Colors.green.shade800,
-                        onPressed: () => _showExportExcelDialog(context),
-                      ),
+                    IconButton(
+                      tooltip: 'Exportar Excel',
+                      icon: const Icon(Icons.table_chart),
+                      color: Colors.green.shade800,
+                      onPressed: () => _exportExcel(context),
                     ),
                   ],
                 ),
@@ -142,22 +138,22 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
     );
   }
 
-
-  void _showExportPdfDialog(BuildContext context) {
+  void _exportPdf(BuildContext context) {
+    final txService = ref.read(transactionServiceProvider);
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Exportar PDF'),
-        content: const Text('Exportar historial de transacciones a PDF.'),
+        content: const Text('¿Quieres exportar todas las transacciones a PDF?'),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCELAR')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCELAR'),
-          ),
-          TextButton(
-            onPressed: () {
-              // TODO: implementar exportación real
-              Navigator.pop(context);
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final path = await txService.exportToPdf();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('PDF guardado en:\n$path')),
+              );
             },
             child: const Text('EXPORTAR'),
           ),
@@ -166,21 +162,22 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
     );
   }
 
-  void _showExportExcelDialog(BuildContext context) {
+  void _exportExcel(BuildContext context) {
+    final txService = ref.read(transactionServiceProvider);
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Exportar Excel'),
-        content: const Text('Exportar historial de transacciones a Excel.'),
+        content: const Text('¿Quieres exportar todas las transacciones a Excel?'),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCELAR')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCELAR'),
-          ),
-          TextButton(
-            onPressed: () {
-              // TODO: implementar exportación real
-              Navigator.pop(context);
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final path = await txService.exportToExcel();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Excel guardado en:\n$path')),
+              );
             },
             child: const Text('EXPORTAR'),
           ),
