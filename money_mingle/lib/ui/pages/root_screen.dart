@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:money_mingle/app_theme.dart';
 import 'package:money_mingle/models/transaction.dart';
-import 'package:money_mingle/domain/services/transaction_service.dart';
+import 'package:money_mingle/providers/transaction_providers.dart';
 import 'package:money_mingle/ui/pages/home/home_screen.dart';
 import 'package:money_mingle/ui/pages/profile/profile_screen.dart';
 import 'package:money_mingle/ui/pages/settings/settings_screen.dart';
@@ -9,23 +10,23 @@ import 'package:money_mingle/ui/pages/transaction/transaction_form.dart';
 import 'package:money_mingle/ui/pages/transaction/transactions_view_screen.dart';
 import 'budget/budget_form.dart';
 import 'budget/goals_form.dart';
-class RootScreen extends StatefulWidget {
+
+class RootScreen extends ConsumerStatefulWidget {
   const RootScreen({super.key});
 
   @override
-  State<RootScreen> createState() => _RootScreenState();
+  ConsumerState<RootScreen> createState() => _RootScreenState();
 }
 
-class _RootScreenState extends State<RootScreen> {
-  final TransactionService transactionService = TransactionService();
+class _RootScreenState extends ConsumerState<RootScreen> {
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Carga inicial de transacciones
-    transactionService.loadTransactions().then((_) {
-      setState(() {});
+    // Carga inicial de transacciones usando el provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(transactionServiceProvider).loadTransactions();
     });
   }
 
@@ -35,7 +36,7 @@ class _RootScreenState extends State<RootScreen> {
       MaterialPageRoute(builder: (_) => TransactionForm(type: type)),
     );
     if (tx != null) {
-      await transactionService.addTransaction(tx);
+      await ref.read(transactionServiceProvider).addTransaction(tx);
       setState(() {});
     }
   }
@@ -103,13 +104,8 @@ class _RootScreenState extends State<RootScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(
-        transactionService: transactionService,
-      ),
-      TransactionsViewScreen(
-        transactions: transactionService.getAllTransactions(),
-        save:         transactionService.saveTransactions,
-      ),
+      HomeScreen(),
+      const TransactionsViewScreen(),
       const ProfileScreen(),
       const SettingsScreen(),
     ];

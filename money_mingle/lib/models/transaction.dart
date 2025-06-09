@@ -3,6 +3,7 @@ import 'dart:convert';
 enum TransactionType { expense, income }
 
 class Transaction {
+  final String? id;
   final TransactionType type;
   final String title;
   final double amount;
@@ -13,6 +14,7 @@ class Transaction {
   final bool isFixed;
 
   Transaction({
+    this.id,
     required this.type,
     required this.title,
     required this.amount,
@@ -23,7 +25,35 @@ class Transaction {
     this.isFixed = false,
   });
 
+  Map<String, dynamic> toMap() => {
+        'type': type == TransactionType.expense ? 'expense' : 'income',
+        'title': title,
+        'amount': amount,
+        'date': date.toIso8601String(),
+        'category': category,
+        'note': note,
+        'receiptPath': receiptPath,
+        'isFixed': isFixed,
+      };
+
+  factory Transaction.fromMap(Map<String, dynamic> map, String id) {
+    return Transaction(
+      id: id,
+      type: map['type'] == 'expense'
+          ? TransactionType.expense
+          : TransactionType.income,
+      title: map['title'],
+      amount: (map['amount'] as num).toDouble(),
+      date: DateTime.parse(map['date']),
+      category: map['category'],
+      note: map['note'],
+      receiptPath: map['receiptPath'],
+      isFixed: map['isFixed'] as bool? ?? false,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
+        'id': id,
         'type': type == TransactionType.expense ? 'expense' : 'income',
         'title': title,
         'amount': amount,
@@ -36,6 +66,7 @@ class Transaction {
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
+      id: json['id'],
       type: json['type'] == 'expense'
           ? TransactionType.expense
           : TransactionType.income,
@@ -45,7 +76,7 @@ class Transaction {
       category: json['category'],
       note: json['note'],
       receiptPath: json['receiptPath'],
-      isFixed: json['isFixed'] as bool? ?? false, 
+      isFixed: json['isFixed'] as bool? ?? false,
     );
   }
 
@@ -56,4 +87,18 @@ class Transaction {
 
   static String listToJson(List<Transaction> txs) =>
       jsonEncode(txs.map((e) => e.toJson()).toList());
+
+  Transaction copyWith({String? id}) {
+    return Transaction(
+      id: id ?? this.id,
+      type: type,
+      title: title,
+      amount: amount,
+      date: date,
+      category: category,
+      note: note,
+      receiptPath: receiptPath,
+      isFixed: isFixed,
+    );
+  }
 }

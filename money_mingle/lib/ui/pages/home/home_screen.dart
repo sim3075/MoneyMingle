@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:money_mingle/domain/services/transaction_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:money_mingle/providers/transaction_providers.dart';
 import 'widgets/info_card.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/monthly_summary.dart';
 import 'widgets/goals_card.dart';
 import 'widgets/graphs/expense_line_chart.dart';
 
-class HomeScreen extends StatelessWidget {
-  final TransactionService transactionService;
-
-  const HomeScreen({super.key, required this.transactionService});
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Cálculo del balance neto
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactionService = ref.watch(transactionServiceProvider);
+
     final net = transactionService.totalIncome - transactionService.totalExpense;
     final expensesByDay = transactionService.getExpensesByDay();
 
@@ -34,7 +34,6 @@ class HomeScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 16),
             ExpenseLineChart(expenses: expensesByDay),
             const SizedBox(height: 16),
@@ -54,7 +53,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-
             RecentTransactions(
               transactions: transactionService.getAllTransactions(),
             ),
