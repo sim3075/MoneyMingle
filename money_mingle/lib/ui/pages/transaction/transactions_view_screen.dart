@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:money_mingle/models/transaction.dart';
 //import 'package:money_mingle/models/transaction.dart';
 import 'package:money_mingle/providers/transaction_providers.dart';
+import 'package:money_mingle/ui/pages/transaction/widgets/transaction_edit_form.dart';
 import 'widgets/category_filter_selector.dart';
 import 'widgets/date_filter_selector.dart';
 import 'widgets/transaction_list.dart';
-//import 'transaction_form.dart';
 
 class TransactionsViewScreen extends ConsumerStatefulWidget {
   const TransactionsViewScreen({Key? key}) : super(key: key);
@@ -85,8 +86,22 @@ class _TransactionsViewScreenState extends ConsumerState<TransactionsViewScreen>
             Expanded(
               child: TransactionsList(
                 items: transactions,
-                onEdit: (_) {}, // Puedes implementar edición aquí si lo deseas
-                onDelete: (_) {},
+                onEdit: (tx) async {
+                  final updated = await Navigator.push<Transaction?>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TransactionEditForm(transaction: tx),
+                    ),
+                  );
+                  if (updated != null) {
+                    await ref.read(transactionServiceProvider).updateTransaction(updated);
+                    setState(() {});
+                  }
+                },
+                onDelete: (tx) async {
+                  await ref.read(transactionServiceProvider).deleteTransaction(tx);
+                  setState(() {});
+                },
               ),
             ),
             const SizedBox(height: 16),

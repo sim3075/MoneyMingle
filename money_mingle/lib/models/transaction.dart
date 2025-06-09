@@ -88,17 +88,27 @@ class Transaction {
   static String listToJson(List<Transaction> txs) =>
       jsonEncode(txs.map((e) => e.toJson()).toList());
 
-  Transaction copyWith({String? id}) {
+  Transaction copyWith({
+    String? id,
+    TransactionType? type,
+    String? title,
+    double? amount,
+    DateTime? date,
+    String? category,
+    String? note,
+    String? receiptPath,
+    bool? isFixed,
+  }) {
     return Transaction(
       id: id ?? this.id,
-      type: type,
-      title: title,
-      amount: amount,
-      date: date,
-      category: category,
-      note: note,
-      receiptPath: receiptPath,
-      isFixed: isFixed,
+      type: type ?? this.type,
+      title: title ?? this.title,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      category: category ?? this.category,
+      note: note ?? this.note,
+      receiptPath: receiptPath ?? this.receiptPath,
+      isFixed: isFixed ?? this.isFixed,
     );
   }
 }
