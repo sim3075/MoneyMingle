@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:money_mingle/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
   final _usersRef = FirebaseFirestore.instance.collection('users');
@@ -43,4 +44,14 @@ class UserService {
     await _usersRef.doc(uid).update({'photoUrl': downloadUrl});
     return downloadUrl;
   }
+}
+
+Future<double> getUserBudget() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getDouble('user_budget') ?? 00.0;
+}
+
+Future<void> setUserBudget(double value) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setDouble('user_budget', value);
 }

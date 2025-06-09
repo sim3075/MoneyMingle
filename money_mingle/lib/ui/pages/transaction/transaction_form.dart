@@ -102,51 +102,54 @@ class _TransactionFormState extends State<TransactionForm> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          CustomTextField(
-            controller: _titleController,
-            label: 'Título',
-            icon: Icons.title,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CustomTextField(
+                controller: _titleController,
+                label: 'Título',
+                icon: Icons.title,
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _amountController,
+                label: 'Cantidad',
+                icon: Icons.attach_money,
+              ),
+              const SizedBox(height: 16),
+              DateField(
+                selectedDate: _selectedDate,
+                onDateChanged: (d) => setState(() => _selectedDate = d),
+              ),
+              const SizedBox(height: 16),
+              NoteField(controller: _noteController),
+              const SizedBox(height: 16),
+              CategorySelector(
+                selected:   _selectedCategory,
+                categories: cats,
+                onChanged:  (v) => setState(() => _selectedCategory = v),
+              ),
+              const SizedBox(height: 16),
+              ReceiptField(
+                image: _receiptImage,
+                onPick: _pickImage,
+              ),
+              CheckboxListTile(
+                title: const Text('Recurrente (fijo)'),
+                subtitle: const Text('Se añadirá automáticamente'),
+                value: _isFixed,
+                onChanged: (v) => setState(() => _isFixed = v ?? false),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+              const SizedBox(height: 24),
+              CustomButton(
+                text: isExpense ? 'Añadir gasto' : 'Añadir ingreso',
+                onPressed: _submit,
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          CustomTextField(
-            controller: _amountController,
-            label: 'Cantidad',
-            icon: Icons.attach_money,
-          ),
-          const SizedBox(height: 16),
-          DateField(
-            selectedDate: _selectedDate,
-            onDateChanged: (d) => setState(() => _selectedDate = d),
-          ),
-          const SizedBox(height: 16),
-          NoteField(controller: _noteController),
-          const SizedBox(height: 16),
-          CategorySelector(
-            selected:   _selectedCategory,
-            categories: cats,
-            onChanged:  (v) => setState(() => _selectedCategory = v),
-          ),
-          const SizedBox(height: 16),
-          ReceiptField(
-            image: _receiptImage,
-            onPick: _pickImage,
-          ),
-
-          CheckboxListTile(
-            title: const Text('Recurrente (fijo)'),
-            subtitle: const Text('Se añadirá automáticamente'),
-            value: _isFixed,
-            onChanged: (v) => setState(() => _isFixed = v ?? false),
-            controlAffinity: ListTileControlAffinity.leading,
-          ),
-
-          const Spacer(),
-          CustomButton(
-            text: isExpense ? 'Añadir gasto' : 'Añadir ingreso',
-            onPressed: _submit,
-          ),
-        ]),
+        ),
       ),
     );
   }
