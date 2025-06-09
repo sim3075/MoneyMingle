@@ -5,6 +5,8 @@ import 'package:money_mingle/ui/widgets/shared/custom_button.dart';
 import '../widgets/category_selector.dart';
 import '../widgets/date_field.dart';
 import '../widgets/note_field.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:money_mingle/domain/services/transaction_service.dart'; // importa tu servicio
 
 class TransactionEditForm extends StatefulWidget {
   final Transaction transaction;
@@ -46,7 +48,7 @@ class _TransactionEditFormState extends State<TransactionEditForm> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     final title = _titleController.text.trim();
     final amt   = double.tryParse(_amountController.text.trim());
     if (title.isEmpty || amt == null) {
@@ -55,16 +57,18 @@ class _TransactionEditFormState extends State<TransactionEditForm> {
       );
       return;
     }
-    final updatedTx = widget.transaction.copyWith(
-      title: title,
-      amount: amt,
-      date: _selectedDate ?? DateTime.now(),
-      category: _selectedCategory,
-      note: _noteController.text.trim(),
-      receiptPath: widget.transaction.receiptPath, // No se edita
-      isFixed: _isFixed,
+
+    final newTx = Transaction(
+      type:        widget.transaction.type,
+      title:       title,
+      amount:      amt,
+      date:        _selectedDate ?? DateTime.now(),
+      category:    _selectedCategory,
+      note:        _noteController.text.trim(),
+      receiptPath: widget.transaction.receiptPath,
+      isFixed:     _isFixed,
     );
-    Navigator.of(context).pop(updatedTx);
+    Navigator.of(context).pop(newTx);
   }
 
   @override
@@ -107,7 +111,6 @@ class _TransactionEditFormState extends State<TransactionEditForm> {
                 onChanged:  (v) => setState(() => _selectedCategory = v),
               ),
               const SizedBox(height: 16),
-              // ReceiptField eliminado para no editar el recibo
               CheckboxListTile(
                 title: const Text('Recurrente (fijo)'),
                 subtitle: const Text('Se añadirá automáticamente'),
