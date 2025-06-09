@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
 import 'package:flutter/material.dart';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
@@ -179,6 +181,59 @@ extension TransactionExportExcel on TransactionsController {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al exportar: $e')),
+      );
+    }
+  }
+}
+extension TransactionExportPdf on TransactionsController {
+  Future<void> exportToPdf(BuildContext context) async {
+    try {
+      final pdf = pw.Document();
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          build: (pw.Context pdfContext) => [
+            pw.Header(level: 0, child: pw.Text('Historial de Transacciones')),
+            pw.Table.fromTextArray(
+              headers: [
+                'Tipo',
+                'Título',
+                'Monto',
+                'Fecha',
+                'Categoría',
+                'Nota',
+                'Fijo'
+              ],
+              data: transactions.map((tx) {
+                return [
+                  tx.type == TransactionType.expense ? 'Gasto' : 'Ingreso',
+                  tx.title,
+                  tx.amount.toStringAsFixed(2),
+                  DateFormat('yyyy-MM-dd').format(tx.date),
+                  tx.category ?? '',
+                  tx.note ?? '',
+                  tx.isFixed ? 'Sí' : 'No',
+                ];
+              }).toList(),
+            ),
+          ],
+        ),
+      );
+
+      // Guarda en sandbox con timestamp
+      final dir = await getExternalStorageDirectory();
+      final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final filePath = '${dir!.path}/transacciones_$stamp.pdf';
+      final file = File(filePath);
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PDF guardado en:\n$filePath')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al exportar PDF: $e')),
       );
     }
   }

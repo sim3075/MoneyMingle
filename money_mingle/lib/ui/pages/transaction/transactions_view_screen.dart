@@ -17,26 +17,29 @@ class TransactionsViewScreen extends StatelessWidget {
   }) : super(key: key);
 
   void _showExportPdfDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Exportar PDF'),
-        content: const Text('Exportar historial de transacciones a PDF.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCELAR'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('EXPORTAR'),
-          ),
-        ],
-      ),
-    );
-  }
+  final ctrl = Provider.of<TransactionsController>(context, listen: false);
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text('Exportar PDF'),
+      content: const Text('Exportar historial de transacciones a PDF.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('CANCELAR'),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context);
+            await ctrl.exportToPdf(context);
+          },
+          child: const Text('EXPORTAR'),
+        ),
+      ],
+    ),
+  );
+}
+
 
   void _showExportExcelDialog(BuildContext context) {
     final ctrl = Provider.of<TransactionsController>(context, listen: false);
